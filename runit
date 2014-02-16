@@ -1,0 +1,13 @@
+#!/bin/sh
+
+PROG="$1"
+ARGS="$2"
+
+shift 2
+
+for one_arg
+do
+	ARGS="${ARGS}, $one_arg"
+done
+
+mvn exec:java -Dexec.mainClass="com.amlinv.activemq.util.$PROG" -Dexec.arguments="$ARGS"

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<!-- Note that this file is refreshed by the server every 60seconds, as specified 
+	in web.xml -->
+
+<log4j:configuration debug="false">
+
+	<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.EnhancedPatternLayout">
+			<param name="ConversionPattern" value="%d{ISO8601} %-5p [%t] %c - %m%n" />
+		</layout>
+	</appender>
+	<logger name="org.springframework">
+		<!-- Print only messages of level warn or above in the package com.foo -->
+		<level value="WARN" />
+	</logger>
+	<logger name="org.hibernate">
+		<!-- Print only messages of level warn or above in the package com.foo -->
+		<level value="WARN" />
+	</logger>
+	<logger name="org.springframework.aop.aspectj">
+		<!-- Print only messages of level warn or above in the package com.foo -->
+		<level value="DEBUG" />
+	</logger>
+	<logger name="org.springframework.aop.interceptor">
+		<!-- Print only messages of level warn or above in the package com.foo -->
+		<level value="TRACE" />
+	</logger>
+	<root>
+		<priority value="INFO" />
+		<appender-ref ref="CONSOLE" />
+	</root>
+</log4j:configuration>

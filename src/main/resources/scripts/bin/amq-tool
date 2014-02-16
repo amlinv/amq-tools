@@ -1,0 +1,9 @@
+#!/bin/sh
+
+VER="${project.version}"
+LIB="amq-tools-${VER}-jar-with-dependencies.jar"
+
+TOOL="$1"
+shift
+
+java -cp "${HOME}/lib/${LIB}" "com.amlinv.activemq.util.$TOOL" "$@"
