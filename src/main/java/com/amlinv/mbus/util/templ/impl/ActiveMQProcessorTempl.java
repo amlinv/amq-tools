@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.amlinv.activemq.util.templ.impl;
+package com.amlinv.mbus.util.templ.impl;
 
 import javax.jms.JMSException;
 
@@ -22,13 +22,13 @@ import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQSession;
 import org.apache.activemq.command.ActiveMQDestination;
 
-import com.amlinv.activemq.util.templ.ActiveMQProcessor;
+import com.amlinv.mbus.util.templ.ActiveMQProcessor;
 
-import com.amlinv.activemq.util.templ.factory.ConnectionFactory;
-import com.amlinv.activemq.util.templ.factory.DestinationFactory;
-import com.amlinv.activemq.util.templ.factory.MessagingClient;
-import com.amlinv.activemq.util.templ.factory.MessagingClientFactory;
-import com.amlinv.activemq.util.templ.factory.SessionFactory;
+import com.amlinv.mbus.util.templ.factory.ConnectionFactory;
+import com.amlinv.mbus.util.templ.factory.DestinationFactory;
+import com.amlinv.mbus.util.templ.factory.MessagingClient;
+import com.amlinv.mbus.util.templ.factory.MessagingClientFactory;
+import com.amlinv.mbus.util.templ.factory.SessionFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

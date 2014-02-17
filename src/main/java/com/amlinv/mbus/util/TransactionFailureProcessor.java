@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.amlinv.activemq.util;
+package com.amlinv.mbus.util;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -23,13 +23,13 @@ import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQSession;
 import org.apache.activemq.command.ActiveMQDestination;
 
-import com.amlinv.activemq.util.templ.factory.DefaultConnectionFactory;
-import com.amlinv.activemq.util.templ.factory.DefaultMessageConsumerFactory;
-import com.amlinv.activemq.util.templ.factory.DefaultQueueFactory;
-import com.amlinv.activemq.util.templ.factory.DefaultSessionFactory;
-import com.amlinv.activemq.util.templ.factory.MessagingClient;
-import com.amlinv.activemq.util.templ.factory.MessagingClientFactory;
-import com.amlinv.activemq.util.templ.impl.ActiveMQProcessorTempl;
+import com.amlinv.mbus.util.templ.factory.DefaultConnectionFactory;
+import com.amlinv.mbus.util.templ.factory.DefaultMessageConsumerFactory;
+import com.amlinv.mbus.util.templ.factory.DefaultQueueFactory;
+import com.amlinv.mbus.util.templ.factory.DefaultSessionFactory;
+import com.amlinv.mbus.util.templ.factory.MessagingClient;
+import com.amlinv.mbus.util.templ.factory.MessagingClientFactory;
+import com.amlinv.mbus.util.templ.impl.ActiveMQProcessorTempl;
 
 public class TransactionFailureProcessor extends ActiveMQProcessorTempl {
 

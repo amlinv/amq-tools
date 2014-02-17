@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.amlinv.activemq.util;
+package com.amlinv.mbus.util;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -22,7 +22,7 @@ import java.io.IOException;
 
 import org.apache.activemq.ActiveMQMessageProducer;
 
-import com.amlinv.activemq.util.templ.QueueProducerTempl;
+import com.amlinv.mbus.util.templ.QueueProducerTempl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
