@@ -31,4 +31,4 @@ LIB="amq-tools-${VER}-jar-with-dependencies.jar"
 TOOL="$1"
 shift
 
-java -cp "${HOME}/lib/${LIB}" "com.amlinv.activemq.util.$TOOL" "$@"
+java -cp "${HOME}/lib/${LIB}" "com.amlinv.mbus.util.$TOOL" "$@"

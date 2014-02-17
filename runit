@@ -35,4 +35,4 @@ do
 	ARGS="${ARGS}, $one_arg"
 done
 
-mvn exec:java -Dexec.mainClass="com.amlinv.activemq.util.$PROG" -Dexec.arguments="$ARGS"
+mvn exec:java -Dexec.mainClass="com.amlinv.mbus.util.$PROG" -Dexec.arguments="$ARGS"
