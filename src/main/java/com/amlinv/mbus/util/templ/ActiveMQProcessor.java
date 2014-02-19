@@ -16,6 +16,7 @@
  */
 package com.amlinv.mbus.util.templ;
 
+import java.io.IOException;
 import javax.jms.JMSException;
 
 import com.amlinv.mbus.util.templ.factory.ConnectionFactory;
@@ -28,5 +29,5 @@ public interface ActiveMQProcessor {
 	void	setDestinationFactory(DestinationFactory destFactory);
 	void	setMessagingClientFactory(MessagingClientFactory clientFactory);
 	void	setSessionFactory(SessionFactory sessFactory);
-	void	execute(String brokerUrl, String destName) throws JMSException;
+	void	execute(String brokerUrl, String destName) throws JMSException, IOException;
 }

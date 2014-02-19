@@ -16,6 +16,7 @@
  */
 package com.amlinv.mbus.util;
 
+import java.io.IOException;
 import javax.jms.JMSException;
 import javax.jms.Message;
 
@@ -63,6 +64,9 @@ public class TransactionFailureProcessor extends ActiveMQProcessorTempl {
 		}
 		catch ( JMSException jms_exc ) {
 			jms_exc.printStackTrace();
+		}
+		catch ( IOException io_exc ) {
+			io_exc.printStackTrace();
 		}
 	}
 }

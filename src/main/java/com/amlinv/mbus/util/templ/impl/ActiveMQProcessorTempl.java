@@ -16,6 +16,7 @@
  */
 package com.amlinv.mbus.util.templ.impl;
 
+import java.io.IOException;
 import javax.jms.JMSException;
 
 import org.apache.activemq.ActiveMQConnection;
@@ -50,7 +51,8 @@ public abstract class ActiveMQProcessorTempl implements ActiveMQProcessor {
 	 * Perform one iteration of the processor which equates to a complete transaction or an iteration of a
 	 *  processing loop in which consumed messages are acknowledged on completion of the loop iteration.
 	 */
-	protected abstract boolean	executeProcessorIteration (MessagingClient client) throws JMSException;
+	protected abstract boolean	executeProcessorIteration (MessagingClient client)
+	throws JMSException, IOException;
 
 	@Override
 	public void	setConnectionFactory (ConnectionFactory connFactory) {
@@ -76,7 +78,7 @@ public abstract class ActiveMQProcessorTempl implements ActiveMQProcessor {
 	 * TBD: JMSException handler strategy, processor factory instead of / in-addition-to subclassing 
 	 */
 	@Override
-	public void	execute (String brokerUrl, String destName) throws JMSException {
+	public void	execute (String brokerUrl, String destName) throws JMSException, IOException {
 		boolean	doneInd;
 		boolean	excFreeInd;
 
