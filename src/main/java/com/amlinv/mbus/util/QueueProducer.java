@@ -35,10 +35,10 @@ import com.amlinv.mbus.util.templ.factory.MessagingClient;
 import com.amlinv.mbus.util.templ.factory.MessagingClientFactory;
 import com.amlinv.mbus.util.templ.factory.Processor;
 import com.amlinv.mbus.util.templ.factory.ProcessorFactory;
-import com.amlinv.mbus.util.templ.impl.ActiveMQProcessorImpl;
+import com.amlinv.mbus.util.templ.impl.ActiveMQEngineImpl;
 
 public class QueueProducer {
-	protected ActiveMQProcessorImpl	engine;
+	protected ActiveMQEngineImpl	engine;
 
 	public static void	main (String[] args) {
 		QueueProducer	consumerProc;
@@ -53,7 +53,7 @@ public class QueueProducer {
 			throw	new Error("invalid command-line arguments");
 		}
 
-		this.engine = new ActiveMQProcessorImpl();
+		this.engine = new ActiveMQEngineImpl();
 
 		this.engine.setConnectionFactory(new DefaultConnectionFactory());
 		this.engine.setSessionFactory(new DefaultSessionFactory(true));

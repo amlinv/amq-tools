@@ -23,7 +23,7 @@ import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQSession;
 import org.apache.activemq.command.ActiveMQDestination;
 
-import com.amlinv.mbus.util.templ.ActiveMQProcessor;
+import com.amlinv.mbus.util.templ.ActiveMQEngine;
 
 import com.amlinv.mbus.util.templ.factory.ConnectionFactory;
 import com.amlinv.mbus.util.templ.factory.DestinationFactory;
@@ -36,8 +36,8 @@ import com.amlinv.mbus.util.templ.factory.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ActiveMQProcessorImpl implements ActiveMQProcessor {
-	private static final Logger		LOG = LoggerFactory.getLogger(ActiveMQProcessorImpl.class);
+public class ActiveMQEngineImpl implements ActiveMQEngine {
+	private static final Logger		LOG = LoggerFactory.getLogger(ActiveMQEngineImpl.class);
 
 	protected ConnectionFactory		connectionFactory;
 	protected DestinationFactory		destinationFactory;

@@ -26,7 +26,6 @@ import org.apache.activemq.command.ActiveMQTextMessage;
 
 import com.amlinv.mbus.util.templ.factory.MessagingClient;
 import com.amlinv.mbus.util.templ.factory.Processor;
-import com.amlinv.mbus.util.templ.impl.ActiveMQProcessorImpl;
 
 public class ProduceFromStdin implements Processor {
 	protected BufferedReader	reader;
