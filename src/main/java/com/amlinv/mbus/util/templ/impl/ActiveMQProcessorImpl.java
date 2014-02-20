@@ -29,30 +29,27 @@ import com.amlinv.mbus.util.templ.factory.ConnectionFactory;
 import com.amlinv.mbus.util.templ.factory.DestinationFactory;
 import com.amlinv.mbus.util.templ.factory.MessagingClient;
 import com.amlinv.mbus.util.templ.factory.MessagingClientFactory;
+import com.amlinv.mbus.util.templ.factory.Processor;
+import com.amlinv.mbus.util.templ.factory.ProcessorFactory;
 import com.amlinv.mbus.util.templ.factory.SessionFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class ActiveMQProcessorTempl implements ActiveMQProcessor {
-	private static final Logger		LOG = LoggerFactory.getLogger(ActiveMQProcessorTempl.class);
+public class ActiveMQProcessorImpl implements ActiveMQProcessor {
+	private static final Logger		LOG = LoggerFactory.getLogger(ActiveMQProcessorImpl.class);
 
 	protected ConnectionFactory		connectionFactory;
 	protected DestinationFactory		destinationFactory;
 	protected MessagingClientFactory	messagingClientFactory;
+	protected ProcessorFactory		processorFactory;
 	protected SessionFactory		sessionFactory;
 
 	protected ActiveMQConnection		amqConnection;
 	protected ActiveMQSession		amqSession;
 	protected ActiveMQDestination		amqDestination;
 	protected MessagingClient		msgClient;
-
-	/**
-	 * Perform one iteration of the processor which equates to a complete transaction or an iteration of a
-	 *  processing loop in which consumed messages are acknowledged on completion of the loop iteration.
-	 */
-	protected abstract boolean	executeProcessorIteration (MessagingClient client)
-	throws JMSException, IOException;
+	protected Processor			processor;
 
 	@Override
 	public void	setConnectionFactory (ConnectionFactory connFactory) {
@@ -67,6 +64,11 @@ public abstract class ActiveMQProcessorTempl implements ActiveMQProcessor {
 	@Override
 	public void	setMessagingClientFactory (MessagingClientFactory clientFactory) {
 		this.messagingClientFactory = clientFactory;
+	}
+
+	@Override
+	public void	setProcessorFactory (ProcessorFactory procFactory) {
+		this.processorFactory = procFactory;
 	}
 
 	@Override
@@ -89,7 +91,7 @@ public abstract class ActiveMQProcessorTempl implements ActiveMQProcessor {
 			this.connect(brokerUrl, destName);
 
 			while ( ! doneInd ) {
-				doneInd = this.executeProcessorIteration(this.msgClient);
+				doneInd = this.processor.executeProcessorIteration(this.msgClient);
 
 				if ( this.amqSession.isTransacted() ) {
 					this.amqSession.commit();
@@ -139,6 +141,8 @@ public abstract class ActiveMQProcessorTempl implements ActiveMQProcessor {
 		this.msgClient      = this.messagingClientFactory.createMessagingClient(this.amqConnection,
 		                                                                        this.amqSession,
 		                                                                        this.amqDestination);
+		this.processor      = this.processorFactory.createProcessor();
+
 		this.amqConnection.start();
 	}
 

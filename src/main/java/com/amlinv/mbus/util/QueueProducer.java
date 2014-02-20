@@ -26,16 +26,19 @@ import javax.jms.TextMessage;
 
 import org.apache.activemq.command.ActiveMQTextMessage;
 
+import com.amlinv.mbus.util.templ.ProduceFromStdin;
 import com.amlinv.mbus.util.templ.factory.DefaultConnectionFactory;
 import com.amlinv.mbus.util.templ.factory.DefaultMessageProducerFactory;
 import com.amlinv.mbus.util.templ.factory.DefaultQueueFactory;
 import com.amlinv.mbus.util.templ.factory.DefaultSessionFactory;
 import com.amlinv.mbus.util.templ.factory.MessagingClient;
 import com.amlinv.mbus.util.templ.factory.MessagingClientFactory;
-import com.amlinv.mbus.util.templ.impl.ActiveMQProcessorTempl;
+import com.amlinv.mbus.util.templ.factory.Processor;
+import com.amlinv.mbus.util.templ.factory.ProcessorFactory;
+import com.amlinv.mbus.util.templ.impl.ActiveMQProcessorImpl;
 
-public class QueueProducer extends ActiveMQProcessorTempl {
-	protected BufferedReader	reader;
+public class QueueProducer {
+	protected ActiveMQProcessorImpl	engine;
 
 	public static void	main (String[] args) {
 		QueueProducer	consumerProc;
@@ -50,15 +53,22 @@ public class QueueProducer extends ActiveMQProcessorTempl {
 			throw	new Error("invalid command-line arguments");
 		}
 
-		this.reader = new BufferedReader(new InputStreamReader(System.in));
+		this.engine = new ActiveMQProcessorImpl();
 
-		this.setConnectionFactory(new DefaultConnectionFactory());
-		this.setSessionFactory(new DefaultSessionFactory(true));
-		this.setMessagingClientFactory(new DefaultMessageProducerFactory());
-		this.setDestinationFactory(new DefaultQueueFactory());		// TBD: support Topics too
+		this.engine.setConnectionFactory(new DefaultConnectionFactory());
+		this.engine.setSessionFactory(new DefaultSessionFactory(true));
+		this.engine.setMessagingClientFactory(new DefaultMessageProducerFactory());
+		this.engine.setDestinationFactory(new DefaultQueueFactory());
+
+		this.engine.setProcessorFactory(
+			new ProcessorFactory() {
+				public Processor	createProcessor () {
+					return	new ProduceFromStdin();
+				}
+			});
 
 		try {
-			this.execute(args[0], args[1]);
+			this.engine.execute(args[0], args[1]);
 		}
 		catch ( JMSException jms_exc ) {
 			jms_exc.printStackTrace();
@@ -67,34 +77,4 @@ public class QueueProducer extends ActiveMQProcessorTempl {
 			io_exc.printStackTrace();
 		}
 	}
-
-	@Override
-	public boolean	executeProcessorIteration (MessagingClient client) throws JMSException, IOException {
-		ActiveMQTextMessage	msg;
-		String			content;
-
-		content = this.getNextMessageContent();
-
-		if ( content == null )
-			return	true;
-
-		System.out.println("SENDING MESSAGE: " + content);
-		msg = new ActiveMQTextMessage();
-		msg.setText(content);
-		client.getProducer().send(msg);
-
-		return	false;
-	}
-
-	protected String	formatMessage (Message msg) throws JMSException {
-		if ( msg instanceof TextMessage ) {
-			return	"TEXT [" + ((TextMessage) msg).getText() + "]";
-		}
-
-		return	msg.toString();
-	}
-
-	protected String	getNextMessageContent () throws IOException {
-		return	this.reader.readLine();
- 	}
 }

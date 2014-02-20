@@ -18,18 +18,24 @@ package com.amlinv.mbus.util.templ;
 
 import java.io.IOException;
 import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.TextMessage;
 
-import com.amlinv.mbus.util.templ.factory.ConnectionFactory;
-import com.amlinv.mbus.util.templ.factory.DestinationFactory;
-import com.amlinv.mbus.util.templ.factory.MessagingClientFactory;
-import com.amlinv.mbus.util.templ.factory.ProcessorFactory;
-import com.amlinv.mbus.util.templ.factory.SessionFactory;
+import org.apache.activemq.ActiveMQConnection;
+import org.apache.activemq.ActiveMQSession;
+import org.apache.activemq.command.ActiveMQDestination;
 
-public interface ActiveMQProcessor {
-	void	setConnectionFactory(ConnectionFactory connFactory);
-	void	setDestinationFactory(DestinationFactory destFactory);
-	void	setMessagingClientFactory(MessagingClientFactory clientFactory);
-	void	setSessionFactory(SessionFactory sessFactory);
-	void	setProcessorFactory(ProcessorFactory procFactory);
-	void	execute(String brokerUrl, String destName) throws JMSException, IOException;
+import com.amlinv.mbus.util.MessageUtil;
+import com.amlinv.mbus.util.templ.factory.MessagingClient;
+import com.amlinv.mbus.util.templ.factory.Processor;
+
+public class ConsumeThenThrow implements Processor {
+
+	@Override
+	public boolean	executeProcessorIteration (MessagingClient client) throws JMSException {
+		Message	msg;
+
+		msg = client.getConsumer().receive();
+		throw	new JMSException("processor failure with" + ( ( msg == null ) ? "out" : "" ) + " message");
+	}
 }

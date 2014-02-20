@@ -19,48 +19,54 @@ package com.amlinv.mbus.util;
 import java.io.IOException;
 import javax.jms.JMSException;
 import javax.jms.Message;
+import javax.jms.TextMessage;
 
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQSession;
 import org.apache.activemq.command.ActiveMQDestination;
 
+import com.amlinv.mbus.util.templ.ConsumeThenThrow;
 import com.amlinv.mbus.util.templ.factory.DefaultConnectionFactory;
 import com.amlinv.mbus.util.templ.factory.DefaultMessageConsumerFactory;
 import com.amlinv.mbus.util.templ.factory.DefaultQueueFactory;
 import com.amlinv.mbus.util.templ.factory.DefaultSessionFactory;
 import com.amlinv.mbus.util.templ.factory.MessagingClient;
 import com.amlinv.mbus.util.templ.factory.MessagingClientFactory;
-import com.amlinv.mbus.util.templ.impl.ActiveMQProcessorTempl;
+import com.amlinv.mbus.util.templ.factory.Processor;
+import com.amlinv.mbus.util.templ.factory.ProcessorFactory;
+import com.amlinv.mbus.util.templ.impl.ActiveMQProcessorImpl;
 
-public class TransactionFailureProcessor extends ActiveMQProcessorTempl {
-
-	public boolean	executeProcessorIteration (MessagingClient client) throws JMSException {
-		Message	msg;
-
-		msg = client.getConsumer().receive();
-		throw	new JMSException("processor failure with" + ( ( msg == null ) ? "out" : "" ) + " message");
-	}
+public class TransactionFailureProcessor {
+	protected ActiveMQProcessorImpl	engine;
 
 	public static void	main (String[] args) {
-		TransactionFailureProcessor	failureProc;
+		QueueConsumer	consumerProc;
 
-		failureProc = new TransactionFailureProcessor();
-		failureProc.runCmdline(args);
+		consumerProc = new QueueConsumer();
+		consumerProc.runCmdline(args);
 	}
 
 	public void	runCmdline (String[] args) {
 		if ( args.length < 2 ) {
-			System.out.println("Usage: TransactionFailureProcessor <broker-url> <dest-name>");
+			System.out.println("Usage: QueueConsumer <broker-url> <dest-name>");
 			throw	new Error("invalid command-line arguments");
 		}
 
-		this.setConnectionFactory(new DefaultConnectionFactory());
-		this.setSessionFactory(new DefaultSessionFactory(true));
-		this.setMessagingClientFactory(new DefaultMessageConsumerFactory());
-		this.setDestinationFactory(new DefaultQueueFactory());		// TBD: support Topics too
+		this.engine = new ActiveMQProcessorImpl();
+
+		this.engine.setConnectionFactory(new DefaultConnectionFactory());
+		this.engine.setSessionFactory(new DefaultSessionFactory(true));
+		this.engine.setMessagingClientFactory(new DefaultMessageConsumerFactory());
+		this.engine.setDestinationFactory(new DefaultQueueFactory());
+		this.engine.setProcessorFactory(
+			new ProcessorFactory() {
+				public Processor	createProcessor () {
+					return	new ConsumeThenThrow();
+				}
+			});
 
 		try {
-			this.execute(args[0], args[1]);
+			this.engine.execute(args[0], args[1]);
 		}
 		catch ( JMSException jms_exc ) {
 			jms_exc.printStackTrace();

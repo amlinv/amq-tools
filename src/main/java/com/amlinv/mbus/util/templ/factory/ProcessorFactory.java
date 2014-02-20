@@ -14,22 +14,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.amlinv.mbus.util.templ;
+package com.amlinv.mbus.util.templ.factory;
 
-import java.io.IOException;
 import javax.jms.JMSException;
 
-import com.amlinv.mbus.util.templ.factory.ConnectionFactory;
-import com.amlinv.mbus.util.templ.factory.DestinationFactory;
-import com.amlinv.mbus.util.templ.factory.MessagingClientFactory;
-import com.amlinv.mbus.util.templ.factory.ProcessorFactory;
-import com.amlinv.mbus.util.templ.factory.SessionFactory;
-
-public interface ActiveMQProcessor {
-	void	setConnectionFactory(ConnectionFactory connFactory);
-	void	setDestinationFactory(DestinationFactory destFactory);
-	void	setMessagingClientFactory(MessagingClientFactory clientFactory);
-	void	setSessionFactory(SessionFactory sessFactory);
-	void	setProcessorFactory(ProcessorFactory procFactory);
-	void	execute(String brokerUrl, String destName) throws JMSException, IOException;
+public interface ProcessorFactory {
+	Processor	createProcessor () throws JMSException;
 }
