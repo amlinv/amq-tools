@@ -17,22 +17,14 @@
 package com.amlinv.mbus.util;
 
 import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 
 import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.TextMessage;
-
-import org.apache.activemq.command.ActiveMQTextMessage;
 
 import com.amlinv.mbus.util.templ.ProduceFromStdin;
 import com.amlinv.mbus.util.templ.factory.DefaultConnectionFactory;
 import com.amlinv.mbus.util.templ.factory.DefaultMessageProducerFactory;
 import com.amlinv.mbus.util.templ.factory.DefaultQueueFactory;
 import com.amlinv.mbus.util.templ.factory.DefaultSessionFactory;
-import com.amlinv.mbus.util.templ.factory.MessagingClient;
-import com.amlinv.mbus.util.templ.factory.MessagingClientFactory;
 import com.amlinv.mbus.util.templ.factory.Processor;
 import com.amlinv.mbus.util.templ.factory.ProcessorFactory;
 import com.amlinv.mbus.util.templ.impl.ActiveMQEngineImpl;

@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 <!--
     Licensed to the Apache Software Foundation (ASF) under one or more
     contributor license agreements.  See the NOTICE file distributed with
@@ -14,11 +16,6 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
-
-<!-- Note that this file is refreshed by the server every 60seconds, as specified 
-	in web.xml -->
 
 <log4j:configuration debug="false">
 
