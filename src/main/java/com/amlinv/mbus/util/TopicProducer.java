@@ -17,39 +17,32 @@
 package com.amlinv.mbus.util;
 
 import java.io.IOException;
+
 import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.TextMessage;
 
-import org.apache.activemq.ActiveMQConnection;
-import org.apache.activemq.ActiveMQSession;
-import org.apache.activemq.command.ActiveMQDestination;
-
-import com.amlinv.mbus.util.templ.ConsumeToStdout;
+import com.amlinv.mbus.util.templ.ProduceFromStdin;
 import com.amlinv.mbus.util.templ.factory.DefaultConnectionFactory;
-import com.amlinv.mbus.util.templ.factory.DefaultMessageConsumerFactory;
-import com.amlinv.mbus.util.templ.factory.DefaultQueueFactory;
+import com.amlinv.mbus.util.templ.factory.DefaultMessageProducerFactory;
+import com.amlinv.mbus.util.templ.factory.DefaultTopicFactory;
 import com.amlinv.mbus.util.templ.factory.DefaultSessionFactory;
-import com.amlinv.mbus.util.templ.factory.MessagingClient;
-import com.amlinv.mbus.util.templ.factory.MessagingClientFactory;
 import com.amlinv.mbus.util.templ.factory.Processor;
 import com.amlinv.mbus.util.templ.factory.ProcessorFactory;
 import com.amlinv.mbus.util.templ.impl.ActiveMQEngineImpl;
 
 @BusUtil
-public class QueueConsumer {
+public class TopicProducer {
 	protected ActiveMQEngineImpl	engine;
 
 	public static void	main (String[] args) {
-		QueueConsumer	consumerProc;
+		TopicProducer	consumerProc;
 
-		consumerProc = new QueueConsumer();
+		consumerProc = new TopicProducer();
 		consumerProc.runCmdline(args);
 	}
 
 	public void	runCmdline (String[] args) {
 		if ( args.length < 2 ) {
-			System.out.println("Usage: QueueConsumer <broker-url> <dest-name>");
+			System.out.println("Usage: TopicProducer <broker-url> <dest-name>");
 			throw	new Error("invalid command-line arguments");
 		}
 
@@ -57,12 +50,13 @@ public class QueueConsumer {
 
 		this.engine.setConnectionFactory(new DefaultConnectionFactory());
 		this.engine.setSessionFactory(new DefaultSessionFactory(true));
-		this.engine.setMessagingClientFactory(new DefaultMessageConsumerFactory());
-		this.engine.setDestinationFactory(new DefaultQueueFactory());
+		this.engine.setMessagingClientFactory(new DefaultMessageProducerFactory());
+		this.engine.setDestinationFactory(new DefaultTopicFactory());
+
 		this.engine.setProcessorFactory(
 			new ProcessorFactory() {
 				public Processor	createProcessor () {
-					return	new ConsumeToStdout();
+					return	new ProduceFromStdin();
 				}
 			});
 

@@ -18,24 +18,17 @@ package com.amlinv.mbus.util;
 
 import java.io.IOException;
 import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.TextMessage;
-
-import org.apache.activemq.ActiveMQConnection;
-import org.apache.activemq.ActiveMQSession;
-import org.apache.activemq.command.ActiveMQDestination;
 
 import com.amlinv.mbus.util.templ.ConsumeThenThrow;
 import com.amlinv.mbus.util.templ.factory.DefaultConnectionFactory;
 import com.amlinv.mbus.util.templ.factory.DefaultMessageConsumerFactory;
 import com.amlinv.mbus.util.templ.factory.DefaultQueueFactory;
 import com.amlinv.mbus.util.templ.factory.DefaultSessionFactory;
-import com.amlinv.mbus.util.templ.factory.MessagingClient;
-import com.amlinv.mbus.util.templ.factory.MessagingClientFactory;
 import com.amlinv.mbus.util.templ.factory.Processor;
 import com.amlinv.mbus.util.templ.factory.ProcessorFactory;
 import com.amlinv.mbus.util.templ.impl.ActiveMQEngineImpl;
 
+@BusUtil
 public class TransactionFailureProcessor {
 	protected ActiveMQEngineImpl	engine;
 

@@ -18,6 +18,7 @@ package com.amlinv.mbus.util.templ.impl;
 
 import java.io.IOException;
 import javax.jms.JMSException;
+import javax.jms.ExceptionListener;
 
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQSession;
@@ -36,6 +37,11 @@ import com.amlinv.mbus.util.templ.factory.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Note that all of the factories must be defined.  However, only the ActiveMQConnection and Processor must be returned
+ * non-null from the factories; the rest may be null as long as the processor and other components do not expect
+ * otherwise.
+ */
 public class ActiveMQEngineImpl implements ActiveMQEngine {
 	private static final Logger		LOG = LoggerFactory.getLogger(ActiveMQEngineImpl.class);
 
@@ -93,11 +99,13 @@ public class ActiveMQEngineImpl implements ActiveMQEngine {
 			while ( ! doneInd ) {
 				doneInd = this.processor.executeProcessorIteration(this.msgClient);
 
-				if ( this.amqSession.isTransacted() ) {
-					this.amqSession.commit();
-				}
-				else if ( ! this.amqSession.isAutoAcknowledge() ) {
-					this.amqSession.acknowledge();
+				if ( amqSession != null ) {
+					if ( this.amqSession.isTransacted() ) {
+						this.amqSession.commit();
+					}
+					else if ( ! this.amqSession.isAutoAcknowledge() ) {
+						this.amqSession.acknowledge();
+					}
 				}
 			}
 
@@ -135,6 +143,7 @@ public class ActiveMQEngineImpl implements ActiveMQEngine {
 
 	protected void	connect (String brokerUrl, String destName) throws JMSException {
 		this.amqConnection  = this.connectionFactory.createConnection(brokerUrl);
+		this.amqConnection.setExceptionListener(new ConnectionEventHandler());
 		this.amqSession     = this.sessionFactory.createSession(this.amqConnection);
 		this.amqDestination = this.destinationFactory.createDestination(this.amqConnection, this.amqSession,
 		                                                                destName);
@@ -146,7 +155,7 @@ public class ActiveMQEngineImpl implements ActiveMQEngine {
 		this.amqConnection.start();
 	}
 
-	protected void	disconnect() throws JMSException {
+	protected synchronized void	disconnect() throws JMSException {
 		if ( this.amqConnection != null ) {
 			this.amqConnection.close();
 		}
@@ -155,5 +164,22 @@ public class ActiveMQEngineImpl implements ActiveMQEngine {
 		this.amqSession     = null;
 		this.amqDestination = null;
 		this.msgClient      = null;
+	}
+
+	protected class	ConnectionEventHandler implements ExceptionListener {
+		public void	onException (JMSException jmsExc) {
+			LOG.error("Exception received on connection", jmsExc);
+
+			synchronized ( ActiveMQEngineImpl.this ) {
+				if ( ActiveMQEngineImpl.this.amqConnection != null ) {
+					try {
+						ActiveMQEngineImpl.this.amqConnection.close();
+					} catch ( JMSException jmsExc2 ) {
+						LOG.info("close AMQ connection on exception failed (this is normal)",
+						         jmsExc2);
+					}
+				}
+			}
+		}
 	}
 }

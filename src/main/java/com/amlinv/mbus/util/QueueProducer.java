@@ -29,6 +29,7 @@ import com.amlinv.mbus.util.templ.factory.Processor;
 import com.amlinv.mbus.util.templ.factory.ProcessorFactory;
 import com.amlinv.mbus.util.templ.impl.ActiveMQEngineImpl;
 
+@BusUtil
 public class QueueProducer {
 	protected ActiveMQEngineImpl	engine;
 

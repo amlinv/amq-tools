@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 /**
  *
  */
+@BusUtil
 public class DestroyDestination
 {
 	private static final Logger	LOG = LoggerFactory.getLogger(DestroyDestination.class);
