@@ -28,16 +28,36 @@ import org.apache.activemq.command.ActiveMQDestination;
 import com.amlinv.mbus.util.MessageUtil;
 import com.amlinv.mbus.util.templ.factory.MessagingClient;
 import com.amlinv.mbus.util.templ.factory.Processor;
+import com.amlinv.mbus.util.templ.impl.NoTimeoutStrategy;
 
 public class ConsumeToStdout implements Processor {
+	protected TimeoutStrategy	timeoutStrategy = new NoTimeoutStrategy();
+
+	public void	setTimeoutStrategy (TimeoutStrategy strategy) {
+		this.timeoutStrategy = strategy;
+	}
 
 	@Override
 	public boolean	executeProcessorIteration (MessagingClient client) throws JMSException {
 		Message	msg;
+		boolean	done = false;
 
-		msg = client.getConsumer().receive();
-		System.out.println(MessageUtil.formatMessage(msg));
+		// TBD: abstract this -- perhaps using a timeout helper that takes a runnable for the actual operation
+		// Like done = TimeoutStrategyUtil.execWithTimeoutStrategy(this.timeoutStrategy, new Runnable() {
+		//	public void	run () { ... } });
+		if ( this.timeoutStrategy.isTimeoutEnabled() ) {
+			msg = client.getConsumer().receive(this.timeoutStrategy.getTimeout());
+			if ( msg == null ) {
+				done = this.timeoutStrategy.shouldTerminate();
+			}
+		} else {
+			msg = client.getConsumer().receive();
+		}
 
-		return	false;
+		if ( msg != null ) {
+			System.out.println(MessageUtil.formatMessage(msg));
+		}
+
+		return	done;
 	}
 }

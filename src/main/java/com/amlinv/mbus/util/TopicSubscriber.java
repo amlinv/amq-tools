@@ -35,10 +35,12 @@ import com.amlinv.mbus.util.templ.factory.MessagingClientFactory;
 import com.amlinv.mbus.util.templ.factory.Processor;
 import com.amlinv.mbus.util.templ.factory.ProcessorFactory;
 import com.amlinv.mbus.util.templ.impl.ActiveMQEngineImpl;
+import com.amlinv.mbus.util.templ.impl.FixedTimeoutStrategy;
 
 @BusUtil
 public class TopicSubscriber {
 	protected ActiveMQEngineImpl	engine;
+	protected long			timeout;
 
 	public static void	main (String[] args) {
 		TopicSubscriber	consumerProc;
@@ -49,9 +51,11 @@ public class TopicSubscriber {
 
 	public void	runCmdline (String[] args) {
 		if ( args.length < 2 ) {
-			System.out.println("Usage: TopicSubscriber <broker-url> <dest-name>");
+			System.out.println("Usage: TopicSubscriber <broker-url> <dest-name> [timeout=<msg-timeout>]");
 			throw	new Error("invalid command-line arguments");
 		}
+
+		parseCmdlineArgs(args, 2);
 
 		this.engine = new ActiveMQEngineImpl();
 
@@ -59,10 +63,19 @@ public class TopicSubscriber {
 		this.engine.setSessionFactory(new DefaultSessionFactory(true));
 		this.engine.setMessagingClientFactory(new DefaultMessageConsumerFactory());
 		this.engine.setDestinationFactory(new DefaultTopicFactory());
+
+		final long	fTimeout = this.timeout;
 		this.engine.setProcessorFactory(
 			new ProcessorFactory() {
 				public Processor	createProcessor () {
-					return	new ConsumeToStdout();
+					ConsumeToStdout	processor = new ConsumeToStdout();
+					if ( fTimeout > 0 ) {
+						FixedTimeoutStrategy timeoutStrategy = new FixedTimeoutStrategy();
+						timeoutStrategy.setTimeout(fTimeout);
+						timeoutStrategy.setDoesTerminate(true);
+						processor.setTimeoutStrategy(timeoutStrategy);
+					}
+					return	processor;
 				}
 			});
 
@@ -74,6 +87,22 @@ public class TopicSubscriber {
 		}
 		catch ( IOException io_exc ) {
 			io_exc.printStackTrace();
+		}
+	}
+
+	protected void	parseCmdlineArgs (String[] args, int first) {
+		int	cur = first;
+		try {
+			while ( cur < args.length ) {
+				if ( args[cur].startsWith("timeout=") ) {
+					this.timeout = Long.parseLong(args[cur].substring(8));
+				} else {
+					throw	new Error("unrecognized command line argument " + args[cur]);
+				}
+				cur++;
+			}
+		} catch ( NumberFormatException numFmtExc ) {
+			throw	new Error("invalid command-line argument " + args[cur], numFmtExc);
 		}
 	}
 }
