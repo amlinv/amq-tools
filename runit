@@ -32,7 +32,7 @@ shift 2
 
 for one_arg
 do
-	ARGS="${ARGS}, $one_arg"
+	ARGS="${ARGS},$one_arg"
 done
 
 mvn exec:java -Dexec.mainClass="com.amlinv.mbus.util.$PROG" -Dexec.arguments="$ARGS"
