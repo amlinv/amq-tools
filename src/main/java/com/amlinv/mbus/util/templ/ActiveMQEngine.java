@@ -19,11 +19,7 @@ package com.amlinv.mbus.util.templ;
 import java.io.IOException;
 import javax.jms.JMSException;
 
-import com.amlinv.mbus.util.templ.factory.ConnectionFactory;
-import com.amlinv.mbus.util.templ.factory.DestinationFactory;
-import com.amlinv.mbus.util.templ.factory.MessagingClientFactory;
-import com.amlinv.mbus.util.templ.factory.ProcessorFactory;
-import com.amlinv.mbus.util.templ.factory.SessionFactory;
+import com.amlinv.mbus.util.templ.factory.*;
 
 public interface ActiveMQEngine {
 	void	setConnectionFactory(ConnectionFactory connFactory);
@@ -31,5 +27,17 @@ public interface ActiveMQEngine {
 	void	setMessagingClientFactory(MessagingClientFactory clientFactory);
 	void	setSessionFactory(SessionFactory sessFactory);
 	void	setProcessorFactory(ProcessorFactory procFactory);
+    void    setHeaderFactory(HeaderFactory hdrFactory);
+
+    ConnectionFactory       getConnectionFactory();
+    DestinationFactory      getDestinationFactory();
+
+    MessagingClientFactory  getMessagingClientFactory();
+    ProcessorFactory        getProcessorFactory();
+    SessionFactory          getSessionFactory();
+    HeaderFactory           getHeaderFactory();
+
 	void	execute(String brokerUrl, String destName) throws JMSException, IOException;
+
+
 }

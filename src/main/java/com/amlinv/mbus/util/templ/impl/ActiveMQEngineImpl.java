@@ -20,19 +20,12 @@ import java.io.IOException;
 import javax.jms.JMSException;
 import javax.jms.ExceptionListener;
 
+import com.amlinv.mbus.util.templ.factory.*;
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQSession;
 import org.apache.activemq.command.ActiveMQDestination;
 
 import com.amlinv.mbus.util.templ.ActiveMQEngine;
-
-import com.amlinv.mbus.util.templ.factory.ConnectionFactory;
-import com.amlinv.mbus.util.templ.factory.DestinationFactory;
-import com.amlinv.mbus.util.templ.factory.MessagingClient;
-import com.amlinv.mbus.util.templ.factory.MessagingClientFactory;
-import com.amlinv.mbus.util.templ.factory.Processor;
-import com.amlinv.mbus.util.templ.factory.ProcessorFactory;
-import com.amlinv.mbus.util.templ.factory.SessionFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +43,7 @@ public class ActiveMQEngineImpl implements ActiveMQEngine {
 	protected MessagingClientFactory	messagingClientFactory;
 	protected ProcessorFactory		processorFactory;
 	protected SessionFactory		sessionFactory;
+    protected HeaderFactory         headerFactory;
 
 	protected ActiveMQConnection		amqConnection;
 	protected ActiveMQSession		amqSession;
@@ -77,12 +71,47 @@ public class ActiveMQEngineImpl implements ActiveMQEngine {
 		this.processorFactory = procFactory;
 	}
 
-	@Override
+    @Override
+    public void setHeaderFactory (HeaderFactory hdrFactory) {
+        this.headerFactory = hdrFactory;
+    }
+
+    @Override
 	public void	setSessionFactory (SessionFactory sessFactory) {
 		this.sessionFactory = sessFactory;
 	}
 
-	/**
+    @Override
+    public ConnectionFactory getConnectionFactory () {
+        return connectionFactory;
+    }
+
+    @Override
+    public DestinationFactory getDestinationFactory () {
+        return destinationFactory;
+    }
+
+    @Override
+    public MessagingClientFactory getMessagingClientFactory () {
+        return messagingClientFactory;
+    }
+
+    @Override
+    public ProcessorFactory getProcessorFactory () {
+        return processorFactory;
+    }
+
+    @Override
+    public SessionFactory getSessionFactory () {
+        return sessionFactory;
+    }
+
+    @Override
+    public HeaderFactory getHeaderFactory () {
+        return headerFactory;
+    }
+
+    /**
 	 * TBD: JMSException handler strategy, processor factory instead of / in-addition-to subclassing 
 	 */
 	@Override
@@ -97,7 +126,7 @@ public class ActiveMQEngineImpl implements ActiveMQEngine {
 			this.connect(brokerUrl, destName);
 
 			while ( ! doneInd ) {
-				doneInd = this.processor.executeProcessorIteration(this.msgClient);
+				doneInd = this.processor.executeProcessorIteration(this, this.msgClient);
 
 				if ( amqSession != null ) {
 					if ( this.amqSession.isTransacted() ) {

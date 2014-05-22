@@ -16,9 +16,12 @@
  */
 package com.amlinv.mbus.util.templ.factory;
 
+import com.amlinv.mbus.util.templ.impl.ActiveMQEngineImpl;
+
 import java.io.IOException;
 import javax.jms.JMSException;
 
 public interface Processor {
-	boolean	executeProcessorIteration (MessagingClient client) throws JMSException, IOException;
+    // TBD999: passing Engine down to Processor is a circular dependency; cut it out!
+	boolean	executeProcessorIteration (ActiveMQEngineImpl activeMQEngine, MessagingClient client) throws JMSException, IOException;
 }

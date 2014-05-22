@@ -19,6 +19,7 @@ package com.amlinv.mbus.util.templ.factory;
 import java.io.IOException;
 import javax.jms.JMSException;
 
+import com.amlinv.mbus.util.templ.impl.ActiveMQEngineImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +35,7 @@ public class IdleProcessor implements Processor {
 	/**
 	 * Execute one iteration; just loop until shutdown, waiting for notification of shutdown.
  	 */
-	public boolean	executeProcessorIteration (MessagingClient client) throws JMSException, IOException {
+	public boolean	executeProcessorIteration (ActiveMQEngineImpl activeMQEngine, MessagingClient client) throws JMSException, IOException {
 		synchronized ( this.shutdownSync ) {
 			while ( ! shutdownInd ) {
 				try {

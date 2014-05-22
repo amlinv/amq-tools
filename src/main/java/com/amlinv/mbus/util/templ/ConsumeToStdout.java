@@ -16,14 +16,10 @@
  */
 package com.amlinv.mbus.util.templ;
 
-import java.io.IOException;
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.TextMessage;
 
-import org.apache.activemq.ActiveMQConnection;
-import org.apache.activemq.ActiveMQSession;
-import org.apache.activemq.command.ActiveMQDestination;
+import com.amlinv.mbus.util.templ.impl.ActiveMQEngineImpl;
 
 import com.amlinv.mbus.util.MessageUtil;
 import com.amlinv.mbus.util.templ.factory.MessagingClient;
@@ -38,7 +34,7 @@ public class ConsumeToStdout implements Processor {
 	}
 
 	@Override
-	public boolean	executeProcessorIteration (MessagingClient client) throws JMSException {
+	public boolean	executeProcessorIteration (ActiveMQEngineImpl activeMQEngine, MessagingClient client) throws JMSException {
 		Message	msg;
 		boolean	done = false;
 
