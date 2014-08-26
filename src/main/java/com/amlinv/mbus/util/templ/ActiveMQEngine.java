@@ -37,7 +37,7 @@ public interface ActiveMQEngine {
     SessionFactory          getSessionFactory();
     HeaderFactory           getHeaderFactory();
 
-	void	execute(String brokerUrl, String destName) throws JMSException, IOException;
+	void	execute(String brokerUrl, String destName) throws JMSException, IOException, InterruptedException;
 
 
 }

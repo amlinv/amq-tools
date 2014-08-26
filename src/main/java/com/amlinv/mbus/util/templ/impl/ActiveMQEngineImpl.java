@@ -21,6 +21,7 @@ import javax.jms.JMSException;
 import javax.jms.ExceptionListener;
 
 import com.amlinv.mbus.util.templ.factory.*;
+import com.amlinv.prop.util.NamedProperties;
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQSession;
 import org.apache.activemq.command.ActiveMQDestination;
@@ -50,8 +51,9 @@ public class ActiveMQEngineImpl implements ActiveMQEngine {
 	protected ActiveMQDestination		amqDestination;
 	protected MessagingClient		msgClient;
 	protected Processor			processor;
+    private NamedProperties properties = new NamedProperties();
 
-	@Override
+    @Override
 	public void	setConnectionFactory (ConnectionFactory connFactory) {
 		this.connectionFactory = connFactory;
 	}
@@ -115,9 +117,12 @@ public class ActiveMQEngineImpl implements ActiveMQEngine {
 	 * TBD: JMSException handler strategy, processor factory instead of / in-addition-to subclassing 
 	 */
 	@Override
-	public void	execute (String brokerUrl, String destName) throws JMSException, IOException {
+	public void	execute (String brokerUrl, String destName) throws JMSException, IOException, InterruptedException {
 		boolean	doneInd;
 		boolean	excFreeInd;
+        long    iterationDelay;
+
+        iterationDelay = this.properties.getLongProperty("iterationDelay", 0);
 
 		doneInd = false;
 		excFreeInd = false;
@@ -136,6 +141,10 @@ public class ActiveMQEngineImpl implements ActiveMQEngine {
 						this.amqSession.acknowledge();
 					}
 				}
+
+                if ( iterationDelay > 0 ) {
+                    Thread.sleep(iterationDelay);
+                }
 			}
 
 			excFreeInd = true;
@@ -195,7 +204,15 @@ public class ActiveMQEngineImpl implements ActiveMQEngine {
 		this.msgClient      = null;
 	}
 
-	protected class	ConnectionEventHandler implements ExceptionListener {
+    public void addProperties (NamedProperties newProperties) {
+        this.properties.putAll(newProperties);
+    }
+
+    public NamedProperties getProperties () {
+        return properties;
+    }
+
+    protected class	ConnectionEventHandler implements ExceptionListener {
 		public void	onException (JMSException jmsExc) {
 			LOG.error("Exception received on connection", jmsExc);
 
