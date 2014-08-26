@@ -131,11 +131,8 @@ public class FloodConnections {
 		try {
 			engine.execute(url, destName);
 		}
-		catch ( JMSException jms_exc ) {
-			jms_exc.printStackTrace();
-		}
-		catch ( IOException io_exc ) {
-			io_exc.printStackTrace();
+		catch ( Exception exc ) {
+			exc.printStackTrace();
 		}
 	}
 

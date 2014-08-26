@@ -61,11 +61,8 @@ public class TransactionFailureProcessor {
 		try {
 			this.engine.execute(args[0], args[1]);
 		}
-		catch ( JMSException jms_exc ) {
-			jms_exc.printStackTrace();
-		}
-		catch ( IOException io_exc ) {
-			io_exc.printStackTrace();
+		catch ( Exception exc ) {
+			exc.printStackTrace();
 		}
 	}
 }
