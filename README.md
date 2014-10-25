@@ -39,3 +39,10 @@ Design Concept
 
 * Simple tools for quick and easy operation.
 * Inversion of control coding practices to minimize redundant code and increase flexibility in the toolset.
+
+
+========
+WEB SITE
+========
+
+All documentation currently resides on github; see the wiki (here: https://github.com/amlinv/amq-tools/wiki/AMQ-TOOLS-Home) for the available documentation.
