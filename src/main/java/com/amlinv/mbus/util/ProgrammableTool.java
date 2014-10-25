@@ -1,14 +1,20 @@
 package com.amlinv.mbus.util;
 
+import com.amlinv.mbus.util.templ.ConsumeToObjectFile;
 import com.amlinv.mbus.util.templ.ConsumeToStdout;
+import com.amlinv.mbus.util.templ.ProduceFromObjectFile;
 import com.amlinv.mbus.util.templ.ProduceFromStdin;
 import com.amlinv.mbus.util.templ.factory.*;
 import com.amlinv.mbus.util.templ.impl.ActiveMQEngineImpl;
 import com.amlinv.prop.util.NamedProperties;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.*;
 
 import static com.amlinv.mbus.util.ProgrammableTool.OperationType.*;
+import static com.amlinv.mbus.util.ProgrammableTool.InputOutputType.*;
 
 /**
  * Created by art on 8/26/14.
@@ -18,6 +24,9 @@ public class ProgrammableTool {
     private Map<String, String> fixedHeaders = new TreeMap<String, String>();
     private ActiveMQEngineImpl  engine;
     private OperationType       opType;
+    private InputOutputType     outputType = STDOUT;
+    private InputOutputType     inputType = STDIN;
+    private String              objectFileName = "messages.dat";
 
     private boolean             useQueue = true;
 
@@ -28,13 +37,17 @@ public class ProgrammableTool {
     }
 
     public void instanceMain (String[] args) {
-        String[] remainingArgs;
+        try {
+            String[] remainingArgs;
 
-        remainingArgs = parseCommandLineProperties(args);
+            remainingArgs = parseCommandLineProperties(args);
 
-        this.setupEngine();
+            this.setupEngine();
 
-        this.executeEngine(remainingArgs);
+            this.executeEngine(remainingArgs);
+        } catch ( Exception exc ) {
+            exc.printStackTrace();
+        }
     }
 
     protected void  setupEngine () {
@@ -59,7 +72,17 @@ public class ProgrammableTool {
                 this.engine.setProcessorFactory(
                         new ProcessorFactory() {
                             public Processor createProcessor () {
-                                return new ConsumeToStdout();
+                                if ( outputType == STDOUT ) {
+                                    return new ConsumeToStdout();
+                                } else if ( outputType == OBJECT_FILE ) {
+                                    try {
+                                        return new ConsumeToObjectFile(new FileOutputStream(objectFileName));
+                                    } catch ( IOException ioExc ) {
+                                        throw new RuntimeException("failed to access file", ioExc);
+                                    }
+                                } else {
+                                    throw new RuntimeException("internal error: unsupported output type: " + outputType);
+                                }
                             }
                         });
                 break;
@@ -71,7 +94,17 @@ public class ProgrammableTool {
                 this.engine.setProcessorFactory(
                         new ProcessorFactory() {
                             public Processor createProcessor () {
-                                return new ProduceFromStdin();
+                                if ( inputType == STDIN ) {
+                                    return new ProduceFromStdin();
+                                } else if ( inputType == OBJECT_FILE ) {
+                                    try {
+                                        return new ProduceFromObjectFile(new FileInputStream(objectFileName));
+                                    } catch ( IOException ioExc ) {
+                                        throw new RuntimeException("failed to access file", ioExc);
+                                    }
+                                } else {
+                                    throw new RuntimeException("internal error: unsupported input type: " + inputType);
+                                }
                             }
                         });
                 break;
@@ -113,7 +146,14 @@ public class ProgrammableTool {
                 } else {
                     this.properties.setProperty(parts[0], "");
                 }
-            } else if ( oneArg.startsWith("-H" ) ) {
+            } else if ( oneArg.startsWith("-f") ) {
+                String content = oneArg.substring(2);
+
+                if ( content.isEmpty() ) {
+                    throw new RuntimeException("-f argument requires an inline argument (e.g. -fx.dat)");
+                }
+                objectFileName = content;
+            } else if ( oneArg.startsWith("-H") ) {
                 String content = oneArg.substring(2);
                 String[] parts = content.split("=", 2);
 
@@ -126,6 +166,9 @@ public class ProgrammableTool {
                 this.opType = CONSUME;
             } else if ( oneArg.equalsIgnoreCase("produce") ) {
                 this.opType = PRODUCE;
+            } else if ( ( oneArg.equalsIgnoreCase("objectfile") ) || ( oneArg.equalsIgnoreCase("ofile") ) ) {
+                this.outputType = OBJECT_FILE;
+                this.inputType = OBJECT_FILE;
             } else if ( oneArg.equalsIgnoreCase("queue") ) {
                 this.useQueue = true;
             } else if ( oneArg.equalsIgnoreCase("topic") ) {
@@ -142,5 +185,11 @@ public class ProgrammableTool {
         CONSUME,
         PRODUCE,
         UNKNOWN
+    }
+
+    public static enum InputOutputType {
+        STDIN,
+        STDOUT,
+        OBJECT_FILE
     }
 }
