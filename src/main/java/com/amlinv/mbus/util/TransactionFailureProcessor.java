@@ -33,9 +33,9 @@ public class TransactionFailureProcessor {
 	protected ActiveMQEngineImpl	engine;
 
 	public static void	main (String[] args) {
-		QueueConsumer	consumerProc;
+		TransactionFailureProcessor	consumerProc;
 
-		consumerProc = new QueueConsumer();
+		consumerProc = new TransactionFailureProcessor();
 		consumerProc.runCmdline(args);
 	}
 
