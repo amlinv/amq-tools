@@ -53,6 +53,8 @@ public class ActiveMQEngineImpl implements ActiveMQEngine {
 	protected Processor			processor;
     private NamedProperties properties = new NamedProperties();
 
+    private ClientIdFactory clientIdFactory;
+
     @Override
 	public void	setConnectionFactory (ConnectionFactory connFactory) {
 		this.connectionFactory = connFactory;
@@ -111,6 +113,14 @@ public class ActiveMQEngineImpl implements ActiveMQEngine {
     @Override
     public HeaderFactory getHeaderFactory () {
         return headerFactory;
+    }
+
+    public ClientIdFactory getClientIdFactory() {
+        return clientIdFactory;
+    }
+
+    public void setClientIdFactory(ClientIdFactory clientIdFactory) {
+        this.clientIdFactory = clientIdFactory;
     }
 
     /**
@@ -182,6 +192,9 @@ public class ActiveMQEngineImpl implements ActiveMQEngine {
 	protected void	connect (String brokerUrl, String destName) throws JMSException {
 		this.amqConnection  = this.connectionFactory.createConnection(brokerUrl);
 		this.amqConnection.setExceptionListener(new ConnectionEventHandler());
+
+        this.setConnectionClientId(this.amqConnection);
+
 		this.amqSession     = this.sessionFactory.createSession(this.amqConnection);
 		this.amqDestination = this.destinationFactory.createDestination(this.amqConnection, this.amqSession,
 		                                                                destName);
@@ -192,6 +205,17 @@ public class ActiveMQEngineImpl implements ActiveMQEngine {
 
 		this.amqConnection.start();
 	}
+
+    protected void  setConnectionClientId (ActiveMQConnection connection) throws JMSException {
+        String clientId = null;
+        if ( this.clientIdFactory != null ) {
+            clientId = this.clientIdFactory.getClientId();
+        }
+
+        if ( clientId != null ) {
+            connection.setClientID(clientId);
+        }
+    }
 
 	protected synchronized void	disconnect() throws JMSException {
 		if ( this.amqConnection != null ) {

@@ -4,7 +4,17 @@ import com.amlinv.mbus.util.templ.ConsumeToObjectFile;
 import com.amlinv.mbus.util.templ.ConsumeToStdout;
 import com.amlinv.mbus.util.templ.ProduceFromObjectFile;
 import com.amlinv.mbus.util.templ.ProduceFromStdin;
-import com.amlinv.mbus.util.templ.factory.*;
+import com.amlinv.mbus.util.templ.ProducedFixedMessages;
+import com.amlinv.mbus.util.templ.factory.DefaultConnectionFactory;
+import com.amlinv.mbus.util.templ.factory.DefaultHeaderFactory;
+import com.amlinv.mbus.util.templ.factory.DefaultMessageConsumerFactory;
+import com.amlinv.mbus.util.templ.factory.DefaultMessageProducerFactory;
+import com.amlinv.mbus.util.templ.factory.DefaultQueueFactory;
+import com.amlinv.mbus.util.templ.factory.DefaultSessionFactory;
+import com.amlinv.mbus.util.templ.factory.DefaultTopicFactory;
+import com.amlinv.mbus.util.templ.factory.FixedClientIdFactory;
+import com.amlinv.mbus.util.templ.factory.Processor;
+import com.amlinv.mbus.util.templ.factory.ProcessorFactory;
 import com.amlinv.mbus.util.templ.impl.ActiveMQEngineImpl;
 import com.amlinv.prop.util.NamedProperties;
 
@@ -29,6 +39,11 @@ public class ProgrammableTool {
     private String              objectFileName = "messages.dat";
 
     private boolean             useQueue = true;
+
+    private String              useClientId = null;
+
+    private int                 fixedMessageSize = 1024;
+    private long                maxFixedMessagesToSend = 1;
 
     public static void  main (String[] args) {
         ProgrammableTool    mainObj = new ProgrammableTool();
@@ -62,6 +77,9 @@ public class ProgrammableTool {
             this.engine.setDestinationFactory(new DefaultTopicFactory());
         }
 
+        if ( this.useClientId != null ) {
+            this.engine.setClientIdFactory(new FixedClientIdFactory(this.useClientId));
+        }
 
         //
         // Setup the operation based on the type of operation requested by the user.
@@ -102,6 +120,8 @@ public class ProgrammableTool {
                                     } catch ( IOException ioExc ) {
                                         throw new RuntimeException("failed to access file", ioExc);
                                     }
+                                } else if ( inputType == FIXED_MESSAGE ) {
+                                    return new ProducedFixedMessages(fixedMessageSize, maxFixedMessagesToSend);
                                 } else {
                                     throw new RuntimeException("internal error: unsupported input type: " + inputType);
                                 }
@@ -162,6 +182,14 @@ public class ProgrammableTool {
                 } else {
                     this.fixedHeaders.put(parts[0], "");
                 }
+            } else if ( oneArg.startsWith("clientId=") ) {
+                String id = oneArg.substring(9);
+
+                if ( ! id.isEmpty() ) {
+                    this.useClientId = id;
+                } else {
+                    this.useClientId = null;
+                }
             } else if ( oneArg.equalsIgnoreCase("consume") ) {
                 this.opType = CONSUME;
             } else if ( oneArg.equalsIgnoreCase("produce") ) {
@@ -173,12 +201,37 @@ public class ProgrammableTool {
                 this.useQueue = true;
             } else if ( oneArg.equalsIgnoreCase("topic") ) {
                 this.useQueue = false;
+            } else if ( ( oneArg.startsWith("fixed-size-message=") ) ||
+                        ( oneArg.startsWith("fixed-size-msg=") ) ) {
+
+                String sizeArg = oneArg.substring(oneArg.indexOf('=') + 1);
+
+                this.fixedMessageSize = parseInt(oneArg, sizeArg);
+                this.inputType = FIXED_MESSAGE;
+            } else if ( oneArg.equalsIgnoreCase("fixed-size-count=") ) {
+
+                String countArg = oneArg.substring(17);
+
+                this.maxFixedMessagesToSend = parseInt(oneArg, countArg);
+                this.inputType = FIXED_MESSAGE;
             } else {
                 remainList.add(oneArg);
             }
         }
 
         return  remainList.toArray(new String[remainList.size()]);
+    }
+
+    protected int parseInt (String argumentName, String str) {
+        int result;
+
+        try {
+            result = Integer.parseInt(str);
+        } catch ( NumberFormatException nmException ) {
+            throw new RuntimeException("argument " + argumentName + " invalid; must be a number: " + str, nmException);
+        }
+
+      return  result;
     }
 
     public static enum OperationType {
@@ -190,6 +243,7 @@ public class ProgrammableTool {
     public static enum InputOutputType {
         STDIN,
         STDOUT,
-        OBJECT_FILE
+        OBJECT_FILE,
+        FIXED_MESSAGE
     }
 }
