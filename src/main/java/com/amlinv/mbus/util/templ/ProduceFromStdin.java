@@ -23,7 +23,6 @@ import java.io.InputStreamReader;
 import javax.jms.JMSException;
 
 import com.amlinv.mbus.util.templ.factory.HeaderFactory;
-import com.amlinv.mbus.util.templ.impl.ActiveMQEngineImpl;
 import org.apache.activemq.command.ActiveMQTextMessage;
 
 import com.amlinv.mbus.util.templ.factory.MessagingClient;
@@ -37,7 +36,7 @@ public class ProduceFromStdin implements Processor {
 	}
 
 	@Override
-	public boolean	executeProcessorIteration (ActiveMQEngineImpl activeMQEngine, MessagingClient client) throws JMSException, IOException {
+	public boolean	executeProcessorIteration (ActiveMQEngine activeMQEngine, MessagingClient client) throws JMSException, IOException {
 		ActiveMQTextMessage	msg;
 		String			content;
 

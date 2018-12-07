@@ -19,7 +19,6 @@ package com.amlinv.mbus.util.templ;
 import com.amlinv.mbus.util.templ.factory.HeaderFactory;
 import com.amlinv.mbus.util.templ.factory.MessagingClient;
 import com.amlinv.mbus.util.templ.factory.Processor;
-import com.amlinv.mbus.util.templ.impl.ActiveMQEngineImpl;
 import org.apache.activemq.openwire.OpenWireFormat;
 import org.apache.activemq.util.ByteSequence;
 import org.apache.activemq.wireformat.WireFormat;
@@ -37,7 +36,7 @@ public class ProduceFromObjectFile implements Processor {
 	}
 
 	@Override
-	public boolean	executeProcessorIteration (ActiveMQEngineImpl activeMQEngine, MessagingClient client)
+	public boolean	executeProcessorIteration (ActiveMQEngine activeMQEngine, MessagingClient client)
             throws JMSException, IOException {
 
         Message msg;

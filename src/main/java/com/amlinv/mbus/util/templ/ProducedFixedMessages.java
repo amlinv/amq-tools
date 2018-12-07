@@ -39,7 +39,7 @@ public class ProducedFixedMessages implements Processor {
 	}
 
 	@Override
-	public boolean	executeProcessorIteration (ActiveMQEngineImpl activeMQEngine, MessagingClient client)
+	public boolean	executeProcessorIteration (ActiveMQEngine activeMQEngine, MessagingClient client)
             throws JMSException, IOException {
 
 		ActiveMQBytesMessage msg;

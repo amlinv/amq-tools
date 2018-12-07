@@ -27,7 +27,7 @@ import com.amlinv.mbus.util.templ.factory.Processor;
 public class ConsumeThenThrow implements Processor {
 
 	@Override
-	public boolean	executeProcessorIteration (ActiveMQEngineImpl activeMQEngine, MessagingClient client) throws JMSException {
+	public boolean	executeProcessorIteration (ActiveMQEngine activeMQEngine, MessagingClient client) throws JMSException {
 		Message	msg;
 
 		msg = client.getConsumer().receive();

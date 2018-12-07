@@ -19,8 +19,6 @@ package com.amlinv.mbus.util.templ;
 import javax.jms.JMSException;
 import javax.jms.Message;
 
-import com.amlinv.mbus.util.templ.impl.ActiveMQEngineImpl;
-
 import com.amlinv.mbus.util.MessageUtil;
 import com.amlinv.mbus.util.templ.factory.MessagingClient;
 import com.amlinv.mbus.util.templ.factory.Processor;
@@ -34,7 +32,7 @@ public class ConsumeToStdout implements Processor {
 	}
 
 	@Override
-	public boolean	executeProcessorIteration (ActiveMQEngineImpl activeMQEngine, MessagingClient client) throws JMSException {
+	public boolean	executeProcessorIteration (ActiveMQEngine activeMQEngine, MessagingClient client) throws JMSException {
 		Message	msg;
 		boolean	done = false;
 

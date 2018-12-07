@@ -43,7 +43,7 @@ public class ConsumeToObjectFile implements Processor {
     }
 
 	@Override
-	public boolean	executeProcessorIteration (ActiveMQEngineImpl activeMQEngine, MessagingClient client)
+	public boolean	executeProcessorIteration (ActiveMQEngine activeMQEngine, MessagingClient client)
             throws JMSException, IOException {
 
 		Message	msg;
