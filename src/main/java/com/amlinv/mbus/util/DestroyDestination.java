@@ -24,6 +24,9 @@ import org.apache.activemq.command.ActiveMQTopic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  *
  */
@@ -35,6 +38,8 @@ public class DestroyDestination
 	protected String			url;
 	protected ActiveMQConnection		conn;
 	protected ActiveMQDestination		dest;
+	private String username;
+	private String password;
 
 	/**
 	 *
@@ -63,36 +68,56 @@ public class DestroyDestination
 	{
 		int			iter;
 
+		String[] remainingArgs = parseCommandline(args);
+
 		try
 		{
-			if ( args.length < 2 )
+			if ( remainingArgs.length < 2 )
 			{
 				this.usage();
 				System.exit(1);
 			}
 
-			url = args[0];
+			url = remainingArgs[0];
 
 			connect();
 
 			iter = 1;
-			while ( iter < args.length )
+			while ( iter < remainingArgs.length )
 			{
-				this.destroyDestination(args[iter]);
+				this.destroyDestination(remainingArgs[iter]);
 				iter++;
 			}
-
-			disconnect();
 		}
 		catch ( Exception exc )
 		{
 			exc.printStackTrace();
 		}
+		finally
+		{
+			disconnect();
+		}
+	}
+
+	private String[] parseCommandline(String[] args) {
+		List<String> remainingList = new LinkedList<String>();
+
+		for (String oneArg : args) {
+			if (oneArg.startsWith("jmsuser=")) {
+				this.username = oneArg.substring(8);
+			} else if (oneArg.startsWith("jmspassword=")) {
+				this.password = oneArg.substring(12);
+			} else {
+				remainingList.add(oneArg);
+			}
+		}
+
+		return remainingList.toArray(new String[remainingList.size()]);
 	}
 
 	protected void	usage ()
 	{
-		System.out.println("Usage: DestroyDestination url dest-name ...\n");
+		System.out.println("Usage: DestroyDestination [jmsuser=<user>] [jmspassword=<password>] url dest-name ...\n");
 		System.out.println("Use fully-qualified destination names with prefixes queue:// or topic://");
 	}
 
@@ -102,17 +127,24 @@ public class DestroyDestination
 	protected void	connect ()
 	throws Exception
 	{
-		conn = ActiveMQConnection.makeConnection(url);
+		if (this.username != null) {
+			conn = ActiveMQConnection.makeConnection(this.username, this.password, url);
+		} else {
+			conn = ActiveMQConnection.makeConnection(url);
+		}
 	}
 
 	/**
 	 * Close the JMS connection used for testing Queue operations.
 	 */
 	protected void	disconnect ()
-	throws Exception
 	{
-		conn.close();
-		conn = null;
+		try {
+			conn.close();
+			conn = null;
+		} catch (Exception exc) {
+			exc.printStackTrace();
+		}
 	}
 
 	protected void	destroyDestination (String destName)
