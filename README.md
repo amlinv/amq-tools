@@ -46,3 +46,39 @@ WEB SITE
 ========
 
 All documentation currently resides on github; see the wiki (here: https://github.com/amlinv/amq-tools/wiki/AMQ-TOOLS-Home) for the available documentation.
+
+
+=====
+NOTES
+=====
+
+Adding a delay to produced messages using the ProgrammableTool:
+
+    amq-tool ProgrammableTool produce -DiterationDelay=1000 'failover://(tcp://localhost:61616)' queue test
+
+Setting username and password for the ProgrammableTool:
+
+    amq-tool ProgrammableTool consume -Djms-user=app1 -Djms-pass=passw0rd 'failover://(tcp://localhost:61616)' queue test
+    
+=====================
+LIST OF -D PROPERTIES
+=====================
+
+| Property Name | Description |
+|---------------|-------------|
+| jms-user      | JMS User Name |
+| jms-pass      | JMS Password  |
+
+
+**aliases**
+
+| Alias | Property Name |
+|-------|---------------|
+| jmsuser       | jms-user |
+| jmsUser       | jms-user |
+| jms-password  | jms-pass |
+| jmspass       | jms-pass |
+| jmspassword   | jms-pass |
+| jmsPass       | jms-pass |
+| jmsPassword   | jms-pass |
+

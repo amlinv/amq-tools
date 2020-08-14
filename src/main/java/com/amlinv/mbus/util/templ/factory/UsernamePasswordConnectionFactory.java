@@ -16,12 +16,35 @@
  */
 package com.amlinv.mbus.util.templ.factory;
 
-import com.amlinv.mbus.util.templ.ActiveMQEngine;
+import org.apache.activemq.ActiveMQConnection;
+import org.apache.activemq.ActiveMQConnectionFactory;
 
-import java.io.IOException;
 import javax.jms.JMSException;
 
-public interface Processor {
-    // TODO: passing Engine down to Processor is a circular dependency; cut it out!
-	boolean	executeProcessorIteration (ActiveMQEngine activeMQEngine, MessagingClient client) throws JMSException, IOException;
+public class UsernamePasswordConnectionFactory implements ConnectionFactory {
+
+	private final String username;
+	private final String password;
+
+//========================================
+// Constructor
+//----------------------------------------
+
+	public UsernamePasswordConnectionFactory(String username, String password) {
+		this.username = username;
+		this.password = password;
+	}
+
+//========================================
+// Create Connection
+//----------------------------------------
+
+	@Override
+	public ActiveMQConnection	createConnection (String brokerUrl) throws JMSException {
+		ActiveMQConnectionFactory	factory;
+
+		factory = new ActiveMQConnectionFactory(this.username, this.password, brokerUrl);
+
+		return	(ActiveMQConnection) factory.createConnection();
+	}
 }

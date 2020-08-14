@@ -5,6 +5,7 @@ import com.amlinv.mbus.util.templ.ConsumeToStdout;
 import com.amlinv.mbus.util.templ.ProduceFromObjectFile;
 import com.amlinv.mbus.util.templ.ProduceFromStdin;
 import com.amlinv.mbus.util.templ.ProducedFixedMessages;
+import com.amlinv.mbus.util.templ.factory.ConnectionFactory;
 import com.amlinv.mbus.util.templ.factory.DefaultConnectionFactory;
 import com.amlinv.mbus.util.templ.factory.DefaultHeaderFactory;
 import com.amlinv.mbus.util.templ.factory.DefaultMessageConsumerFactory;
@@ -15,6 +16,7 @@ import com.amlinv.mbus.util.templ.factory.DefaultTopicFactory;
 import com.amlinv.mbus.util.templ.factory.FixedClientIdFactory;
 import com.amlinv.mbus.util.templ.factory.Processor;
 import com.amlinv.mbus.util.templ.factory.ProcessorFactory;
+import com.amlinv.mbus.util.templ.factory.UsernamePasswordConnectionFactory;
 import com.amlinv.mbus.util.templ.impl.ActiveMQEngineImpl;
 import com.amlinv.prop.util.NamedProperties;
 
@@ -67,7 +69,9 @@ public class ProgrammableTool {
 
     protected void  setupEngine () {
         engine = new ActiveMQEngineImpl();
-        this.engine.setConnectionFactory(new DefaultConnectionFactory());
+
+        this.setupEngineConnectionFactory();
+
         this.engine.setSessionFactory(new DefaultSessionFactory(true));
         this.engine.addProperties(this.properties);
 
@@ -132,6 +136,42 @@ public class ProgrammableTool {
             default:
                 throw new RuntimeException("operation must be specified");
         }
+    }
+
+    private void setupEngineConnectionFactory() {
+        // Check for a specified username
+        String username = null;
+        if (this.properties.containsProperty("jms-user")) {
+            username = this.properties.getStringProperty("jms-user");
+        } else if (this.properties.containsProperty("jmsuser")) {
+            username = this.properties.getStringProperty("jmsuser");
+        } else if (this.properties.containsProperty("jmsUser")) {
+            username = this.properties.getStringProperty("jmsUser");
+        }
+
+        String password = null;
+        if (this.properties.containsProperty("jms-pass")) {
+            password = this.properties.getStringProperty("jms-pass");
+        } else if (this.properties.containsProperty("jms-password")) {
+            password = this.properties.getStringProperty("jms-password");
+        } else if (this.properties.containsProperty("jmspass")) {
+            password = this.properties.getStringProperty("jmspass");
+        } else if (this.properties.containsProperty("jmspassword")) {
+            password = this.properties.getStringProperty("jmspassword");
+        } else if (this.properties.containsProperty("jmsPass")) {
+            password = this.properties.getStringProperty("jmsPass");
+        } else if (this.properties.containsProperty("jmsPassword")) {
+            password = this.properties.getStringProperty("jmsPassword");
+        }
+
+        ConnectionFactory connectionFactory;
+        if ((username != null) || (password != null)) {
+            connectionFactory = new UsernamePasswordConnectionFactory(username, password);
+        } else {
+            connectionFactory = new DefaultConnectionFactory();
+        }
+
+        this.engine.setConnectionFactory(connectionFactory);
     }
 
     protected void  configureHeaderFactory () {
